@@ -130,8 +130,8 @@
 
 
 		$('#save').click(function () {
-		saveNpreserve();
-		
+			saveNpreserve();
+
 		});
 
 
@@ -253,10 +253,10 @@
 
 		});
 
-function saveNpreserve() {
-//спаси и сохрани в DB
-	var total = $('#sub_total').val();
-			var raha = $('#raha').val();
+		function saveNpreserve() {
+			//спаси и сохрани в DB
+			var total = parseFloat($('#sub_total').val());
+			var raha = parseFloat($('#raha').val());
 			///pank or cache?
 			if (raha) {
 				//var raha = $('#pank').val();
@@ -289,7 +289,7 @@ function saveNpreserve() {
 				$('#raha').focus();
 			}
 
-};
+		};
 		function show(me, b) {
 
 			let name = me,
@@ -658,7 +658,7 @@ function saveNpreserve() {
 </div>
 
 <div id="section-to-print">
-<!-- Vot tut 4ek sobiraetsya -->
+	<!-- Vot tut 4ek sobiraetsya -->
 </div>
 <div class="modal2">
 	<!-- Place at bottom of page -->

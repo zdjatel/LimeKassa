@@ -64,12 +64,16 @@ if ($number > 0) {
    $result3 = mysqli_query($connect, $sql3); 
     while ($row1  =  mysqli_fetch_array($result3) )
 {	
-	$pankItogo=$row1[0];
-	
+	$pankItogo=$row1[0];	
 	}
-	
+    $sql33 = "SELECT SUM(`summa`) FROM `raha_zurnal` WHERE `pank`=1";
+   $result33 = mysqli_query($connect, $sql33); 
+    while ($row11  =  mysqli_fetch_array($result33) )
+{	
+	$cacheItogo=$row11[0];	
+	}
     /// --Return--///
-    echo $echoline . $pankrespone.$pankItogo;
+    echo $echoline . $pankrespone." Pank ".$pankItogo." Sula ".$cacheItogo;
     //     mysqli_free_result($result);
 
     mysqli_close($connect);
