@@ -1,0 +1,564 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="/app/views/script.js"></script>
+<script src="/app/views/shortcut.js"></script>
+<script src="https://unpkg.com/bootstrap-table@1.15.4/dist/bootstrap-table.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.15.4/dist/bootstrap-table.min.css">
+
+
+<style>
+	@media print {
+		body * {
+			visibility: hidden;
+		}
+
+		#section-to-print,
+		#section-to-print * {
+			visibility: visible;
+		}
+
+		#section-to-print {
+			position: absolute;
+			left: 0;
+			top: 0;
+		}
+	}
+
+	.table td,
+	.table th {
+		padding: .35rem;
+
+	}
+
+	.container {
+		width: 100%;
+		padding-right: 15px;
+		padding-left: 15px;
+		/* margin-right: auto; */
+		/* margin-left: auto; */
+		max-width: 4000px;
+	}
+
+	.city {
+		width: 139px;
+	}
+
+	.w-tk {
+		width: 10%;
+	}
+
+	.w-sum {
+		width: 13%;
+	}
+
+	.w-sum2 {
+		width: 30%;
+	}
+</style>
+<script>
+	$(document).ready(function () {
+
+
+		var i = 1;
+		var j = 1;
+		$('#name' + i).focus();
+
+		shortcut.add("F12", function () {
+			$('#save').trigger("click");
+		});
+		shortcut.add("F4", function () {
+			$('#saveprint').trigger("click");
+		});
+		shortcut.add("F5", function () {
+			$('#givemoney').trigger("click");
+		});
+		shortcut.add("esc", function () {
+			$('#reset').trigger("click");
+		});
+		shortcut.add("F7+Enter", function () {
+			$('#name' + i).focus();
+		});
+
+		$(document).on('click', '.btn_remove', function () {
+			var button_id = $(this).attr("id");
+			$('#row' + button_id + '').remove();
+			$('#total' + i).val(0);
+			calc_total();
+		});
+
+		$(document).on('keyup keydown change', '.qty', function () {
+			$('#total' + i).val(0);
+			$('#hind' + i).val(0);
+			$('#tara' + i).val(0);
+			calc();
+		});
+
+
+		$('#save').click(function () {
+
+			var total = $('#sub_total').val();
+			var raha = $('#raha').val();
+
+			// || raha >= total
+
+			if (!$('#product1').val()) {
+				alert("Пустое поле товара");
+			} else if (raha >= total) {
+				$('#sda4a').val(total - raha);
+				$.ajax({
+					url: "/app/controllers/Demo2.php",
+					method: "POST",
+					data: $('#add_name').serialize() + "&sub_total=" + $('#sub_total').val() + "&date=" + '{{@date}}' +
+						"&doknr=" + '{{ @doknr }}' + "&autor=" + '{{ @name }}',
+					success: function (data) {
+						alert(data);
+						//$('#add_name')[0].reset();
+						location.reload();
+						$("#table").bootstrapTable('refresh')
+					}
+				});
+			} else {
+				alert("Дэнги дай");
+				$('#raha').focus();
+			}
+		});
+
+
+		$('#reset').click(function () {
+			location.reload();
+			$("#table").bootstrapTable('refresh')
+		});
+
+		$('#givemoney').click(function () {
+			$('#raha').focus();
+		});
+		$('#saveprint').click(function () {
+			window.print();
+
+		});
+
+
+		$(document).on('keypress', function (e) {
+			if (e.which == 13) {
+
+				var me = $('#name' + i).val();
+
+				if ($('#name' + i).val()) {
+					show(me, i);
+				} else {
+					alert("Pusto!");
+					
+				}
+			}
+		});
+
+		// if ($('#name' + i).focus()) {
+		// 	$('#name' + i).on('keydown', function (e) {
+		// 		if (e.which == 13) {
+		// 		var me = $('#name' + i).val();
+		// 		if (!$('#name' + i).val()) {
+		// 			alert("Pusto!");
+		// 		} else {
+		// 			show(me, i);
+
+		// 		}
+		// 	}
+		// 	});
+		// }
+
+		// $('#name' + i).on('keypress', function (e) {
+		// 	if (e.which == 13) {
+		// 		var me = $('#name' + i).val();
+		// 		if (!$('#name' + i).val()) {
+		// 			alert("Pusto!");
+		// 		} else {
+		// 			show(me, i);
+
+		// 		}
+		// 	}
+		// });
+
+
+		$('#raha').on('input', function () {
+
+			var total = $('#sub_total').val();
+			var raha = $('#raha').val();
+
+			if (raha > total) {
+				$('#sda4a').val((total - raha).toFixed(2));
+			}
+			else {
+				$('#sda4a').val(0);
+			}
+
+		});
+
+
+		function show(me, b) {
+
+			let name = me,
+				jqxhr = $.post("demo.php", { name: name });
+			jqxhr.done((response) => {
+				var obj = jQuery.parseJSON(response);
+				console.log(obj);
+				try {
+					//  Block of code to try
+					$("#product" + b).val(obj.name);
+					$("#hind" + b).val(obj.hind);
+					$("#tara" + b).val(obj.tara);
+
+					$('#tk' + b).val(1);
+					$('#name' + b).prop('readonly', true);
+					$('#product' + b).prop('readonly', true);
+					$('#hind' + b).prop('readonly', true);
+					$('#tara' + b).prop('readonly', true);
+
+					calc();
+
+					i++;
+					$('#tab_logic').append('<tr id="row' + i + '"><td><input type="text" id="product' + i + '" name="product[]" placeholder="Enter Product Name" class="form-control" /></td><td><input type="text" id="name' + i + '" name="name[]" placeholder="Product EAN" class="form-control city mybur" /></td><td><input type="number" id="tk' + i + '" name="tk[]" placeholder="tk" class="form-control qty" step="0" min="0" /></td><td><input type="number" id="hind' + i + '" name="hind[]" placeholder="Enter Hind Price" class="form-control price" /></td><td><input type="number" id="total' + i + '" name="total[]" placeholder="0.00" class="form-control total" readonly /></td><td><input type="number" id="tara' + i + '" name="tara[]" placeholder="0.00" step=".01" class="form-control tara" /></td><td><button type="button" name="remove" id="' + i + '" class="btn btn-danger btn_remove">X</button></td></tr>');
+					$('#name' + i).focus();
+					$('#name' + i).on('keydown', function (e) {
+						if (e.which == 39) {
+							j = i - 1;
+							$('#tk' + j).focus();
+							$('#tk' + j).val('');
+							if ($('#tk' + j).focus()) {
+								$('#tk' + j).on('keydown', function (e) {
+									if (e.which == 13) {
+										//j = i - 1;
+										$('#name' + i).focus();
+
+									}
+								});
+
+
+							}
+
+
+						}
+					});
+
+				}
+				catch (e) {
+					//  Block of code to handle errors
+					alert("Takogo EAN netu!");
+					$('#name' + b).val('');
+				}
+			});
+			jqxhr.fail((error) => {
+				throw new Error(`${error.status}: ${error.text}`)
+			});
+		}
+
+
+
+		var $table = $('#table');
+		$table.bootstrapTable({
+			url: '/app/controllers/table.php',
+			pagination: false,
+			cache: false,
+			columns: [{
+				field: 'doknr',
+				title: 'Nr',
+				sortable: false,
+			}, {
+				field: 'kuupaev',
+				title: 'Date',
+				sortable: false,
+				visible: true,
+
+			}, {
+				field: 'summa',
+				title: 'Summa',
+				sortable: false,
+				visible: true,
+			}, {
+				field: 'product',
+				title: 'product',
+				sortable: false,
+				visible: false,
+
+			}, {
+				field: 'pos',
+				title: 'Pood',
+				sortable: false,
+				visible: true,
+			}, {
+				field: 'autor',
+				title: 'Muuja',
+				sortable: false,
+				visible: true,
+			},
+
+			],
+
+		});
+
+
+		function showinfo(me) {
+
+			var m;
+
+			let doknr = me,
+				jqxhr = $.post("onetomany.php", { doknr: doknr });
+			jqxhr.done((response) => {
+				var obj = jQuery.parseJSON(response);
+				//  console.log(obj);
+				try {
+					console.log(obj);
+
+					for (var i = 0, len = obj.length; i < len; ++i) {
+
+						var buhlo = obj[i];
+
+						$('#prod' + i).append(buhlo.product);
+						$('#ea' + i).append(buhlo.EAN);
+						$('#t' + i).append(buhlo.tk);
+						$('#su' + i).append(buhlo.total);
+
+						m = i + 1;
+						$('#modalbody').append('<li id="prod' + m + '"class="border-bottom list-item col-sm-6"></li><li id="ea' + m + '"class="border-bottom list-item col-sm-2"></li><li id="t' + m + '"class="border-bottom list-item col-sm-1"></li><li id="su' + m + '"class="border-bottom list-item col-sm-1"></li>');
+
+					}
+
+					$('#prod' + m).remove();
+					$('#ea' + m).remove();
+					$('#t' + m).remove();
+					$('#su' + m).remove();
+
+
+					//$('#prod').val(obj[0].product);
+					$('#myModal').modal('show');
+
+					$('#myModal').on('hidden.bs.modal', function () {
+						// do something…
+						$("#modalbody").empty();
+						$('#dok').empty();
+						$('#dat').empty();
+						$('#sum').empty();
+						$('#pipl').empty();
+						$('#pod').empty();
+					});
+
+				}
+				catch (e) {
+					//  Block of code to handle errors
+					alert("wtf");
+				}
+			});
+			jqxhr.fail((error) => {
+				throw new Error(`${error.status}: ${error.text}`)
+			});
+		}
+
+		$('#table').on('click-row.bs.table', function (row, $element, field) {
+
+			console.log($element);
+			//$('#modalbody').append('<li class="list-group-item" id="prod' + 0 + '"></li>');
+			$('#modalbody').append('<li id="prod' + 0 + '"class="border-bottom list-item col-sm-6"></li><li id="ea' + 0 + '"class="border-bottom list-item col-sm-2"></li><li id="t' + 0 + '"class="border-bottom list-item col-sm-1"></li><li id="su' + 0 + '"class="border-bottom list-item col-sm-1"></li>');
+
+			$('#dok').append($element.doknr);
+			$('#dat').append($element.kuupaev);
+			$('#sum').append($element.summa);
+			$('#pipl').append($element.autor);
+			$('#pod').append($element.pos);
+
+			showinfo($element.doknr);
+		})
+	})
+</script>
+
+<!------ Include the above in your HEAD tag ---------->
+
+<div class="container mx-auto">
+
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">Журнал</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+							aria-hidden="true">&times;</span></button>
+				</div>
+				<div class="modal-body">
+
+					<div class="container" id="section-to-print">
+
+
+						<div class="row">
+
+							<div class="col">
+								<h5>Продажа №: <span id="dok" class="badge badge-warning"></span></h5>
+								<h5>Дата: <span id="dat" class="badge badge-warning"></span></h5>
+								<h5>Сумма: <span id="sum" class="badge badge-warning"></span></h5>
+							</div>
+
+							<div class="col">
+								<h5>Müüja: <span id="pipl" class="badge badge-warning"></span></h5>
+								<h5>Pood: <span id="pod" class="badge badge-warning"></span></h5>
+
+							</div>
+						</div>
+						<br>
+						<ul class="list-unstyled row h6">
+							<li class="list-item col-sm-6 border-bottom">Product</li>
+							<li class="list-item col-sm-2 border-bottom">EAN</li>
+							<li class="list-item col-sm-1 border-bottom">tk</li>
+							<li class="list-item col-sm-1 border-bottom">Hind</li>
+						</ul>
+						<ul id="modalbody" class="list-unstyled row">
+
+						</ul>
+					</div>
+					<!-- <div class="form-group">
+								<textarea class="form-control" id="textarea1" rows="10"></textarea>
+								</div> -->
+
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" id="saveprint" class="btn btn-secondary mb-2 ml-2">Печатать</button>
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+
+		<div class="col-md-3">
+			<h5>Pood: <span class="badge badge-secondary">Mustamae 116</span></h5>
+			<h5>Müüja: <span class="badge badge-secondary">{{ @name }}</span></h5>
+		</div>
+		<div class="col-md-3">
+			<h5>Arvuti: <span class="badge badge-secondary">TERE-PC</span></h5>
+			<h5>Kuupaev: <span class="badge badge-secondary">{{@date}}</span></h5>
+		</div>
+
+		<div class="col">
+			<textarea name="systemAlert" id="systemAlert" cols="30" rows="1"></textarea>
+		</div>
+
+		<div class="col">
+			<div class="float-right">
+				<form class="form-signin" method="POST" action="/logout">
+					<button class="btn btn-danger" type="submit">Logout</button>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-8" id="section-to-print">
+			<form class="form-group" name="add_name" id="add_name">
+				<table class="table table-bordered table-hover" id="tab_logic">
+					<thead>
+						<tr>
+							<th class="text-center"> Product </th>
+							<th class="text-center w-tk"> EAN </th>
+							<th class="text-center w-tk"> tk </th>
+							<th class="text-center w-tk"> Hind </th>
+							<th class="text-center w-sum"> Summa </th>
+							<th class="text-center w-tk"> Tara </th>
+
+						</tr>
+					</thead>
+					<tbody>
+						<tr id="row1">
+							<td><input type="text" id="product1" name="product[]" placeholder="Enter Product Name"
+									class="form-control" /></td>
+							<td><input type="text" id="name1" name="name[]" placeholder="Product EAN"
+									class="form-control city mybur" /></td>
+							<td><input type="number" id="tk1" name="tk[]" placeholder="tk" class="form-control qty"
+									step="0" min="0" /></td>
+							<td><input type="number" id="hind1" name="hind[]" placeholder="Enter Hind Price"
+									class="form-control price" /></td>
+							<td><input type="number" id="total1" name="total[]" placeholder='0.00'
+									class="form-control total" readonly /></td>
+							<td><input type="number" id="tara1" name="tara[]" step=".01" placeholder="0.00"
+									class="form-control tara" /></td>
+							<td><button type="button" name="remove" id="1" class="btn btn-danger btn_remove">X</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+
+			</form>
+
+
+			3272519036208
+			<br />
+			4770033230724
+			<br />
+			4020461022997
+			<br />
+			4740019015829
+			<br />
+			4744136018909
+			<br />
+			5449000055255
+		</div>
+
+
+
+		<div class="col-md-3 ml-5">
+			<form class="form-group" name="final" id="final">
+				<table class="table table-bordered table-hover" id="tab_logic_total">
+					<tbody>
+						<tr>
+							<th class="text-left">Сумма к оплате</th>
+							<td class="text-center w-sum2"><input type="number" name='sub_total' placeholder='0.00'
+									class="form-control" id="sub_total" /></td>
+						</tr>
+						<tr>
+							<th class="text-left">Принято наличных</th>
+							<td class="text-center w-sum2"><input type="number" id="raha" placeholder='0.00'
+									class="form-control" />
+							</td>
+						</tr>
+						<tr>
+							<th class="text-left">Принято по карте</th>
+							<td class="text-center w-sum2"><input type="number" placeholder='0.00'
+									class="form-control" />
+							</td>
+						</tr>
+						<tr>
+							<th class="text-left">Принято всего</th>
+							<td class="text-center w-sum2"><input type="number" id="money" placeholder='0.00'
+									class="form-control" readonly /></td>
+						</tr>
+						<tr>
+							<th class="text-left">Сдача</th>
+							<td class="text-center w-sum2"><input type="number" id="sda4a" placeholder='0.00'
+									class="form-control" /></td>
+						</tr>
+					</tbody>
+				</table>
+			</form>
+
+			<div class="row">
+				<button id="save" class="btn btn-primary mb-2">Сохранить (F12)</button>
+				<button id="saveprint" class="btn btn-primary mb-2 ml-2">Печатать и сохранить (F4)</button>
+				<button id="givemoney" class="btn btn-primary mb-2">Принять оплату (F5)</button>
+				<button id="reset" class="btn btn-primary mb-2 ml-2">Отменить (Esc)</button>
+
+				<div id="test"></div>
+
+			</div>
+			<br>
+
+			<div class="row">
+
+				<table class="table-sm" style="font-size: 12px" data-height="250" data-sort-name="doknr"
+					data-sort-order="desc" id="table">
+				</table>
+
+			</div>
+		</div>
+	</div>
+
+
+</div>

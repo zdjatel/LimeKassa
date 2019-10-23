@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PosTCP version="4.2.5">
+	<TransactionResponse>
+		<ReturnCode>0</ReturnCode>
+		<Reason></Reason>
+		<TransactionData>
+			<Amount>100</Amount>
+			<CurrencyName>EUR</CurrencyName>
+			<DateTime>16.10.2019 11:34:49</DateTime>
+			<Stan>011790</Stan>
+			<Type>T1</Type>
+			<CardAction>2</CardAction>
+			<AuthorizationNo>641700</AuthorizationNo>
+			<SignatureRequired>0</SignatureRequired>
+			<PINVerified>1</PINVerified>
+		</TransactionData>
+		<CardData>
+			<PhysicalType>51</PhysicalType>
+			<Pan>************0836</Pan>
+			<CardName>EC/MC</CardName>
+			<Expires>**/**</Expires>
+			<ServiceCode>221</ServiceCode>
+			<AL>DEBIT MASTERCARD</AL>
+			<AID>A0000000041010</AID>
+		</CardData>
+		<TerminalData>
+			<ID>ICT45940</ID>
+			<TerminalName>12452032 010</TerminalName>
+			<Name>Alkotrend OU</Name>
+			<Address>Mustamae tee 116 Tallinn EST</Address>
+			<MerchantRegNo>12452032</MerchantRegNo>
+			<PayDesk>010</PayDesk>
+			<VerificationResult>0000008000</VerificationResult>
+			<ApplicationCryptogram>CDE929B6782A4F3E</ApplicationCryptogram>
+		</TerminalData>
+	</TransactionResponse>
+</PosTCP>
